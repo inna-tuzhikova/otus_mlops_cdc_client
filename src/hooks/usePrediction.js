@@ -10,16 +10,20 @@ const usePrediction = () => {
 
   const analyze = (file) => {
     setAnalyzing(true);
-    axios.post(url, {num:12})
-      .then(res => {
-        setPrediction(res.data);
-        setAnalyzingError(null);
-      })
-      .catch(e => {
-        setPrediction(null)
-        setAnalyzingError(e);
-      })
-      .finally(() => setAnalyzing(false))
+    axios.post(
+      url,
+      {image: file},
+      {headers: {'Content-Type': 'multipart/form-data'}}
+    )
+    .then(res => {
+      setPrediction(res.data);
+      setAnalyzingError(null);
+    })
+    .catch(e => {
+      setPrediction(null)
+      setAnalyzingError(e);
+    })
+    .finally(() => setAnalyzing(false))
   };
   const clear = () => {
     setPrediction(null);

@@ -73,7 +73,7 @@ const StateWithImage = ({
   };
   const errorToText = (error) => {
     if (error) {
-      return `Error: ${analyzingError.response.data.detail}`;
+      return `Error: ${error.response.data.detail.toString()}`;
     }
     return null;
   };
@@ -84,6 +84,9 @@ const StateWithImage = ({
   const loadImageWrapped = (event) => {
     loadImage(event);
     clear();
+  };
+  const onAnalyzeClick = ()  => {
+    analyze(imageFile);
   };
 
   return (
@@ -100,7 +103,7 @@ const StateWithImage = ({
         enabled={!analyzing}/>
       <button
         disabled={analyzing}
-        onClick={analyze}>
+        onClick={onAnalyzeClick}>
           {analyzeButtonText}
       </button>
     </div>
