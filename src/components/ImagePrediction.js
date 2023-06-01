@@ -1,11 +1,6 @@
-import React, { useState, useRef } from 'react'
+import React, { useRef } from 'react'
 import useUploadedImage from './../hooks/useUploadedImage';
 import usePrediction from '../hooks/usePrediction';
-
-const IMAGE_LOADED = 0;
-const ANALYZING_IMAGE = 1;
-const ANALYZING_ERROR = 2;
-const ANALYZING_RESULT = 3;
 
 const LoadImageButton = ({
   name,
@@ -40,7 +35,10 @@ const LoadImageButton = ({
   );
 };
 
-const Idle = ({loadImage, imageLoading}) => {
+const Idle = ({
+  loadImage,
+  imageLoading
+}) => {
   return (
     <>
       <LoadImageButton name='Load' loadImage={loadImage}/>
@@ -49,7 +47,7 @@ const Idle = ({loadImage, imageLoading}) => {
   );
 };
 
-const LoadingImage = ({setState}) => {
+const LoadingImage = () => {
   return (
     <div>{'LoadingImage'}</div>
   );
@@ -60,42 +58,74 @@ const StateWithImage = ({
   imageUrl,
   loadImage
 }) => {
-  const { prediction, analyzing, analyzingError, analyze, clear } = usePrediction();
+  const {
+    prediction,
+    analyzing,
+    analyzingError,
+    analyze,
+    clear
+  } = usePrediction();
+  const predictionToText = (prediction) => {
+    if (prediction) {
+      return `${prediction.class_label}, confidence ${prediction.confidence}`;
+    }
+    return null;
+  };
+  const errorToText = (error) => {
+    if (error) {
+      return `Error: ${analyzingError.response.data.detail}`;
+    }
+    return null;
+  };
   const analyzeButtonText = analyzing ? 'Analyzing...' : 'Analyze'
-  const predictionText = prediction ? `${prediction.class_label}, confidence ${prediction.confidence}` : null;
-  const errorText = analyzingError ? `Error: ${analyzingError.response.data.detail}`: null;
+  const predictionText = predictionToText(prediction);
+  const errorText = errorToText(analyzingError);
 
-  const loadImageWrapper = (event) => {
+  const loadImageWrapped = (event) => {
     loadImage(event);
     clear();
   };
 
   return (
     <div style={{display: 'flex', flexDirection: 'column'}}>
-      <img alt='Loaded' src={imageUrl} style={{maxHeight: 500, maxWidth: 500}} />
+      <img
+        alt='Loaded'
+        src={imageUrl}
+        style={{maxHeight: 500, maxWidth: 500}} />
       {predictionText}
       {errorText}
-      <LoadImageButton name='Another' loadImage={loadImageWrapper} enabled={!analyzing}/>
-      <button disabled={analyzing} onClick={analyze}>{analyzeButtonText}</button>
+      <LoadImageButton
+        name='Another'
+        loadImage={loadImageWrapped}
+        enabled={!analyzing}/>
+      <button
+        disabled={analyzing}
+        onClick={analyze}>
+          {analyzeButtonText}
+      </button>
     </div>
   );
 };
 
-
 const ImagePrediction = () => {
   const {
     loadImage,
-    imageFile, imageUrl,
-    imageLoading, imageLoaded
+    imageFile,
+    imageUrl,
+    imageLoading
   } = useUploadedImage();
-
 
   return (
     <>
       {imageFile ? (
-        <StateWithImage {...{imageFile, imageUrl, loadImage}} />
+        <StateWithImage
+          imageFile={imageFile}
+          imageUrl={imageUrl}
+          loadImage={loadImage} />
         ) : (
-          <Idle loadImage={loadImage} {...{imageLoading}} />
+          <Idle
+            loadImage={loadImage}
+            imageLoading={imageLoading} />
         )}
     </>
   );
