@@ -1,6 +1,9 @@
 import React, { useRef } from 'react'
 import useUploadedImage from './../hooks/useUploadedImage';
 import usePrediction from '../hooks/usePrediction';
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 const LoadImageButton = ({
   name,
@@ -26,12 +29,32 @@ const LoadImageButton = ({
         style={{display: 'none'}}
         ref={imageInput}
         onChange={handleInputChange}/>
-      <button
+      <Button
+        variant='contained'
         onClick={onButtonClick}
         disabled={!enabled}>
           {name}
-      </button>
+      </Button>
     </>
+  );
+};
+
+const AnalyzeButton = ({
+  analyze,
+  analyzing,
+  imageFile
+}) => {
+  const text = analyzing ? 'Analyzing...' : 'Analyze'
+  const onClick = () => {
+    analyze(imageFile);
+  };
+  return (
+    <Button
+      disabled={analyzing}
+      onClick={onClick}
+      variant='outlined'>
+        {text}
+    </Button>
   );
 };
 
@@ -39,17 +62,17 @@ const Idle = ({
   loadImage,
   imageLoading
 }) => {
+  const text = imageLoading ? 'Loading' : 'Load animal image';
   return (
-    <>
-      <LoadImageButton name='Load' loadImage={loadImage}/>
-      {imageLoading && <LoadingImage /> }
-    </>
-  );
-};
-
-const LoadingImage = () => {
-  return (
-    <div>{'LoadingImage'}</div>
+    <Stack
+      sx={{ pt: 4 }}
+      direction='row'
+      spacing={2}
+      justifyContent='center'>
+        <LoadImageButton
+          name={text}
+          loadImage={loadImage} />
+    </Stack>
   );
 };
 
@@ -67,7 +90,8 @@ const StateWithImage = ({
   } = usePrediction();
   const predictionToText = (prediction) => {
     if (prediction) {
-      return `${prediction.class_label}, confidence ${prediction.confidence}`;
+      const confidence = Math.round(prediction.confidence * 100);
+      return `${prediction.class_label}, confidence ${confidence}%`;
     }
     return null;
   };
@@ -77,7 +101,6 @@ const StateWithImage = ({
     }
     return null;
   };
-  const analyzeButtonText = analyzing ? 'Analyzing...' : 'Analyze'
   const predictionText = predictionToText(prediction);
   const errorText = errorToText(analyzingError);
 
@@ -85,28 +108,48 @@ const StateWithImage = ({
     loadImage(event);
     clear();
   };
-  const onAnalyzeClick = ()  => {
-    analyze(imageFile);
-  };
 
   return (
-    <div style={{display: 'flex', flexDirection: 'column'}}>
-      <img
-        alt='Loaded'
-        src={imageUrl}
-        style={{maxHeight: 500, maxWidth: 500}} />
-      {predictionText}
-      {errorText}
-      <LoadImageButton
-        name='Another'
-        loadImage={loadImageWrapped}
-        enabled={!analyzing}/>
-      <button
-        disabled={analyzing}
-        onClick={onAnalyzeClick}>
-          {analyzeButtonText}
-      </button>
-    </div>
+    <Stack
+      spacing={2}
+      alignItems='center'>
+        <img
+          alt='Loaded'
+          src={imageUrl}
+          style={{
+            maxHeight: 500,
+            maxWidth: 500
+          }} />
+        <Typography
+          variant='h5'
+          align='center'
+          color='text.secondary'
+          paragraph
+          style={{fontFamily: 'monospace'}} >
+            {predictionText}
+        </Typography>
+        <Typography
+          variant='h5'
+          align='center'
+          color='text.secondary'
+          paragraph
+          style={{fontFamily: 'monospace'}} >
+            {errorText}
+        </Typography>        <Stack
+          sx={{ pt: 4 }}
+          direction='row'
+          spacing={2}
+          justifyContent='center'>
+            <LoadImageButton
+              name='Another'
+              loadImage={loadImageWrapped}
+              enabled={!analyzing} />
+            <AnalyzeButton
+              analyze={analyze}
+              imageFile={imageFile}
+              analyzing={analyzing} />
+        </Stack>
+    </Stack>
   );
 };
 
