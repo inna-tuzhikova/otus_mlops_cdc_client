@@ -1,7 +1,8 @@
+import ImagePrediction from './components/ImagePrediction';
 
 const App = () => {
   return (
-    <div>{'Hello world!'}</div>
+    <ImagePrediction />
   );
 }
 
