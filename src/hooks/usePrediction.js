@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 
-const url = 'http://158.160.8.102/api/v1/predict';
+const url = 'http://158.160.14.105/api/v1/predict';
 
 const usePrediction = () => {
   const [prediction, setPrediction] = useState();
