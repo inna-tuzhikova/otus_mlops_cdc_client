@@ -97,8 +97,12 @@ const StateWithImage = ({
   };
   const errorToText = (error) => {
     if (error) {
-      return `Error: ${error.response.data.detail.toString()}`;
-    }
+      try {
+        return `Error: ${error.response.data.detail.toString()}`;
+      } catch {
+        return error.message || 'Cannot analyze image';
+      }
+    }  
     return null;
   };
   const predictionText = predictionToText(prediction);
@@ -135,7 +139,8 @@ const StateWithImage = ({
           paragraph
           style={{fontFamily: 'monospace'}} >
             {errorText}
-        </Typography>        <Stack
+        </Typography>
+        <Stack
           sx={{ pt: 4 }}
           direction='row'
           spacing={2}
